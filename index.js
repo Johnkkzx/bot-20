@@ -193,7 +193,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
               CARGO_APROVADO_3
             ]).catch(console.error);
 
-            await membro.setNickname(`Soldado. ${nome} | ${idPass}`)
+            await membro.setNickname(`Soldado PM. ${nome} | ${idPass}`)
               .catch(console.error);
           }
         }
