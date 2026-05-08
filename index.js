@@ -17,7 +17,7 @@ const client = new Client({
 });
 
 // 🔑 CONFIGURAÇÃO
-const CARGO_APROVADO = '1292571689946841218';
+const CARGO_APROVADO_5 = '1292571689946841218';
 const CARGO_APROVADO_1 = '1292571689946841217';
 const CARGO_APROVADO_2 = '1292571689946841213';
 const CARGO_APROVADO_3 = '1292571689917354019';
@@ -187,7 +187,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         if (membro) {
 
           await membro.roles.add([
-            CARGO_APROVADO,
+            CARGO_APROVADO_5,
             CARGO_APROVADO_1,
             CARGO_APROVADO_2,
             CARGO_APROVADO_3
