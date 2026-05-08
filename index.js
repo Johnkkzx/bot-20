@@ -184,11 +184,19 @@ client.on(Events.InteractionCreate, async (interaction) => {
         if (aprovado) {
           const membro = await interaction.guild.members.fetch(candidatoId).catch(() => null);
 
-          if (membro) {
-            await membro.roles.add(CARGO_APROVADO).catch(console.error);
-            await membro.setNickname(`${nome} | ${idPass}`).catch(console.error);
-          }
+        if (membro) {
+
+          await membro.roles.add([
+            CARGO_APROVADO,
+            CARGO_APROVADO_1,
+            CARGO_APROVADO_2,
+            CARGO_APROVADO_3
+          ]).catch(console.error);
+
+          await membro.setNickname(`${nome} | ${idPass}`)
+            .catch(console.error);
         }
+        
 
         await interaction.message.edit({
           content: `Ação realizada por <@${interaction.user.id}>!`,
