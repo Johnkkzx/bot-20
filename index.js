@@ -24,9 +24,9 @@ const CARGO_APROVADO = '1292571689917354019';
 
 // 📌 CANAIS
 const CANAL_FORMULARIO = '1381735538121248820';
-const CANAL_APROVACAO = '1500374091151179836';
-const CANAL_APROVADOS = '1500374093373902888';
-const CANAL_RECUSADOS = '1500374095458603030';
+const CANAL_APROVACAO = '1502286435959443600';
+const CANAL_APROVADOS = '1502286473381019809';
+const CANAL_RECUSADOS = '1502286473381019809';
 
 
 // 🚀 BOT ONLINE
@@ -37,12 +37,12 @@ client.once(Events.ClientReady, async () => {
   if (!canal) return console.log('❌ Canal do formulário não encontrado');
 
   const embedPainel = new EmbedBuilder()
-    .setTitle('🎭 | Sistema de Setagem')
+    .setTitle('REGISTRO PARA INCORPORAÇÃO')
     .setDescription(
       'Preencha corretamente.\n\n' +
       '⚠️ **AVISO IMPORTANTE:**\n' +
-      '• Siga as calls\n' +
-      '• Rádio obrigatória\n' +
+      '• Não faça sem ter sido aprovado\n' +
+      '• Caso seja feito pode ser colocado em black-list \n' +
       '• Aguarde aprovação.'
     )
     .setColor(0x2b2d31);
