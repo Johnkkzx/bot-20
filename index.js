@@ -137,7 +137,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           .setTitle('📋 | Novo Registro')
           .setDescription(
             `👤 <@${interaction.user.id}>\n\n` +
-            `**Nome:** ${nome}\n**ID:** ${idPass}\n**Recrutador:** ${recNome}`
+            `**Nome de Guerra:** ${nome}\n**RG:** ${idPass}\n**Autorização:** ${recNome}`
           )
           .setColor(0x2b2d31);
 
