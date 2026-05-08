@@ -50,7 +50,7 @@ client.once(Events.ClientReady, async () => {
   const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId('abrir_formulario')
-      .setLabel('Recrutamento')
+      .setLabel('Registro Policial')
       .setStyle(ButtonStyle.Secondary)
   );
 
@@ -63,26 +63,26 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   try {
 
-    // 🔥 ABRIR MODAL (PRIORIDADE)
+    // 🔥 ABRIR MODAL 
     if (interaction.isButton() && interaction.customId === 'abrir_formulario') {
       const modal = new ModalBuilder()
         .setCustomId('registroModal')
-        .setTitle('Sistema de Setagem');
+        .setTitle('Registro Policial');
 
       modal.addComponents(
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder().setCustomId('nome').setLabel('Nome').setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId('nome').setLabel('Nome de Guerra').setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder().setCustomId('id_passaporte').setLabel('ID').setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId('id_passaporte').setLabel('RG').setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder().setCustomId('recrutador_nome').setLabel('Recrutador').setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId('recrutador_nome').setLabel('Autorização').setStyle(TextInputStyle.Short)
         )
       );
 
       await interaction.showModal(modal);
-      return; // 🚨 CRÍTICO
+      return; 
     }
 
     // 🔥 MODAL SUBMIT
