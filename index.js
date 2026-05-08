@@ -175,7 +175,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           .setColor(aprovado ? 0x00FF00 : 0xFF0000)
           .addFields(
             { name: 'Candidato:', value: `<@${candidatoId}> (ID: ${idPass})`, inline: true },
-            { name: 'Staff:', value: `<@${interaction.user.id}>`, inline: true }
+            { name: ':', value: `<@${interaction.user.id}>`, inline: true }
           )
           .setTimestamp();
 
@@ -193,7 +193,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
               CARGO_APROVADO_3
             ]).catch(console.error);
 
-            await membro.setNickname(`${nome} | ${idPass}`)
+            await membro.setNickname(`Soldado. ${nome} | ${idPass}`)
               .catch(console.error);
           }
         }
