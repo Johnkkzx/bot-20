@@ -174,7 +174,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           .setTitle(aprovado ? '✅ Registro Aprovado' : '❌ Registro Negado')
           .setColor(aprovado ? 0x00FF00 : 0xFF0000)
           .addFields(
-            { name: 'Candidato:', value: `<@${candidatoId}> (RG: ${idPass})`, inline: true },
+            { name: 'Candidato:', value: `<@${candidatoId}> (TIPO SANGUÍNEO: ${idPass})`, inline: true },
             { name: 'Staff:', value: `<@${interaction.user.id}>`, inline: true }
           )
           .setTimestamp();
