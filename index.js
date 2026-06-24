@@ -74,7 +74,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           new TextInputBuilder().setCustomId('nome').setLabel('Nome de Guerra').setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder().setCustomId('id_passaporte').setLabel('TIPO SANGUÍNEO').setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId('id_passaporte').setLabel('Tipo Sanguíneo').setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
           new TextInputBuilder().setCustomId('recrutador_nome').setLabel('Autorização').setStyle(TextInputStyle.Short)
@@ -137,7 +137,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           .setTitle('📋 | Novo Registro')
           .setDescription(
             `👤 <@${interaction.user.id}>\n\n` +
-            `**Nome de Guerra:** ${nome}\n**TIPO SANGUÍNEO:** ${idPass}\n**Autorização:** ${recNome}`
+            `**Nome de Guerra:** ${nome}\n**Tipo Sanguíneo:** ${idPass}\n**Autorização:** ${recNome}`
           )
           .setColor(0x2b2d31);
 
@@ -174,7 +174,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           .setTitle(aprovado ? '✅ Registro Aprovado' : '❌ Registro Negado')
           .setColor(aprovado ? 0x00FF00 : 0xFF0000)
           .addFields(
-            { name: 'Candidato:', value: `<@${candidatoId}> (TIPO SANGUÍNEO: ${idPass})`, inline: true },
+            { name: 'Candidato:', value: `<@${candidatoId}> (Tipo Sanguíneo: ${idPass})`, inline: true },
             { name: 'Staff:', value: `<@${interaction.user.id}>`, inline: true }
           )
           .setTimestamp();
