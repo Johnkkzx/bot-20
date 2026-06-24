@@ -74,7 +74,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           new TextInputBuilder().setCustomId('nome').setLabel('Nome de Guerra').setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
-          new TextInputBuilder().setCustomId('id_passaporte').setLabel('RG').setStyle(TextInputStyle.Short)
+          new TextInputBuilder().setCustomId('id_passaporte').setLabel('TIPO SANGUÍNEO').setStyle(TextInputStyle.Short)
         ),
         new ActionRowBuilder().addComponents(
           new TextInputBuilder().setCustomId('recrutador_nome').setLabel('Autorização').setStyle(TextInputStyle.Short)
@@ -137,7 +137,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           .setTitle('📋 | Novo Registro')
           .setDescription(
             `👤 <@${interaction.user.id}>\n\n` +
-            `**Nome de Guerra:** ${nome}\n**RG:** ${idPass}\n**Autorização:** ${recNome}`
+            `**Nome de Guerra:** ${nome}\n**TIPO SANGUÍNEO:** ${idPass}\n**Autorização:** ${recNome}`
           )
           .setColor(0x2b2d31);
 
@@ -193,7 +193,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
               CARGO_APROVADO_3
             ]).catch(console.error);
 
-            await membro.setNickname(`Soldado PM. ${nome} | ${idPass}`)
+            await membro.setNickname(`Soldado PM. ${nome} ${idPass}`)
               .catch(console.error);
           }
         }
