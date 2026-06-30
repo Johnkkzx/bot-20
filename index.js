@@ -52,6 +52,19 @@ const PATENTES = {
   "Al Soldado": { cargo: "1510135059800133695", emoji: "1518086550251114658" }
 };
 
+// Lista unificada para limpar os cargos do usuário ao atualizar/promover
+const TODOS_OS_CARGOS_MILITARES = [
+  ...Object.values(COMPANHIAS).map(c => c.cargo),
+  ...Object.values(PATENTES).map(p => p.cargo),
+  '1292571689946841217',
+  '1292571689946841213',
+  '1292571689917354019',
+  '1292571689917354020',
+  '1292571689946841215',
+  '1292571689917354021',
+  '1521632259478651020'
+];
+
 let registros = new Map();
 
 if (fs.existsSync('./registros.json')) {
@@ -253,6 +266,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
       try {
         const membro = await interaction.guild.members.fetch(userId);
+        
+        // Remove todos os cargos antigos do mapeamento para evitar duplicidade ou acúmulo
+        const cargosParaRemover = TODOS_OS_CARGOS_MILITARES.filter(id => membro.roles.cache.has(id));
+        if (cargosParaRemover.length > 0) {
+          await membro.roles.remove(cargosParaRemover);
+        }
+
         const rolesParaAdicionar = [];
         
         if (COMPANHIAS[dados.companhia]?.cargo) rolesParaAdicionar.push(COMPANHIAS[dados.companhia].cargo);
@@ -307,10 +327,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
             { name: '🎖️ Patente/Cargo:', value: `\`${dados.patente}\``, inline: true }
           )
           .setThumbnail(interaction.guild.iconURL({ dynamic: true }))
+          .setFooter({ text: `Aprovado por: ${interaction.user.tag}`, iconURL: interaction.user.displayAvatarURL() })
           .setTimestamp();
 
         await canalAprovados.send({ embeds: [embedAprovado] });
       }
+
+      // Deleta o registro temporário para liberar nova criação limpa no futuro
+      registros.delete(userId);
+      salvarRegistros();
 
       return interaction.update({ content: `✅ O registro de <@${userId}> foi **aprovado**!`, components: [] });
     }
@@ -335,6 +360,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             { name: '🪪 Nome enviado:', value: dados.nome, inline: true },
             { name: '🩸 Tipo Sanguíneo informado:', value: `\`${dados.tiposanguineo}\``, inline: true }
           )
+          .setFooter({ text: `Recusado por: ${interaction.user.tag}`, iconURL: interaction.user.displayAvatarURL() })
           .setTimestamp();
 
         await canalRecusados.send({ embeds: [embedRecusado] });
