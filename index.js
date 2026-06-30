@@ -36,19 +36,20 @@ const COMPANHIAS = {
 };
 
 const PATENTES = {
-  "Coronel": { cargo: "1474226455729668156", emoji: "1518085181221769276" },
-  "T.Coronel": { cargo: "1474226912934232239", emoji: "1518085261744013342" },
-  "Major": { cargo: "1512085315177807882", emoji: "1518085342522245271" },
-  "Capitão": { cargo: "1474228200694616176", emoji: "1518090001177645168" },
-  "1° Tenente": { cargo: "1474228316100886702", emoji: "1518086107726876853" },
-  "2° Tenente": { cargo: "1474228418420670596", emoji: "1518086151636779008" },
-  "Aspirante": { cargo: "1474228707173601330", emoji: "1518086204891992216" },
-  "Subtenente": { cargo: "1474229761550061629", emoji: "1518086267198242866" },
-  "1° Sgt": { cargo: "1474230092631642215", emoji: "1518086321883713687" },
-  "2° Sgt": { cargo: "1474230277957222420", emoji: "1518086366884397268" },
-  "3° Sgt": { cargo: "1474230429350363166", emoji: "1518086419099156591" },
-  "Cabo": { cargo: "1474230554453872680", emoji: "1518086482148196362" },
-  "Soldado": { cargo: "1474230626231259207", emoji: "1518086550251114658" }
+  "Coronel": { cargo: "1292571690018013276", emoji: "1518085181221769276" },
+  "T.Coronel": { cargo: "1292571690018013275", emoji: "1518085261744013342" },
+  "Major": { cargo: "1292571690018013274", emoji: "1518085342522245271" },
+  "Capitão": { cargo: "1292571689963622610", emoji: "1518090001177645168" },
+  "1° Tenente": { cargo: "1292571689963622609", emoji: "1518086107726876853" },
+  "2° Tenente": { cargo: "1292571689963622608", emoji: "1518086151636779008" },
+  "Aspirante": { cargo: "1292571689963622607", emoji: "1518086204891992216" },
+  "Subtenente": { cargo: "1292571689963622604", emoji: "1518086267198242866" },
+  "1° Sgt": { cargo: "1292571690018013273", emoji: "1518086321883713687" }, /
+  "2° Sgt": { cargo: "1292571689963622602", emoji: "1518086366884397268" },
+  "3° Sgt": { cargo: "1292571689963622601", emoji: "1518086419099156591" },
+  "Cabo": { cargo: "1292571689946841219", emoji: "1518086482148196362" },
+  "Soldado": { cargo: "1292571689946841218", emoji: "1518086550251114658" },
+  "Al Soldado": { cargo: "1510135059800133695", emoji: "1518086550251114658" }
 };
 
 let registros = new Map();
@@ -252,10 +253,46 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
       try {
         const membro = await interaction.guild.members.fetch(userId);
+        const rolesParaAdicionar = [];
         
-        if (COMPANHIAS[dados.companhia]?.cargo) await membro.roles.add(COMPANHIAS[dados.companhia].cargo);
-        if (PATENTES[dados.patente]?.cargo) await membro.roles.add(PATENTES[dados.patente].cargo);
+        // 1. Cargo da Companhia e da Patente selecionada
+        if (COMPANHIAS[dados.companhia]?.cargo) rolesParaAdicionar.push(COMPANHIAS[dados.companhia].cargo);
+        if (PATENTES[dados.patente]?.cargo) rolesParaAdicionar.push(PATENTES[dados.patente].cargo);
 
+        // 2. Cargo obrigatório para TODOS
+        rolesParaAdicionar.push('1292571689946841217');
+
+        // 3. Condicionais com base na patente
+        const p = dados.patente;
+
+        const deSoldadoAtuSubtenente = ["Soldado", "Cabo", "3° Sgt", "2° Sgt", "1° Sgt", "Subtenente"];
+        const deSgtAtuSubtenente = ["3° Sgt", "2° Sgt", "1° Sgt", "Subtenente"];
+        const deAspiranteAtuCoronel = ["Aspirante", "2° Tenente", "1° Tenente", "Capitão", "Major", "T.Coronel", "Coronel"];
+
+        if (deSoldadoAtuSubtenente.includes(p)) {
+          rolesParaAdicionar.push('1292571689946841213'); 
+          rolesParaAdicionar.push('1292571689917354019'); 
+        }
+
+        if (deSgtAtuSubtenente.includes(p)) {
+          rolesParaAdicionar.push('1292571689917354020'); 
+        }
+
+        if (deAspiranteAtuCoronel.includes(p)) {
+          rolesParaAdicionar.push('1292571689946841215'); 
+          rolesParaAdicionar.push('1292571689917354021'); 
+
+        if (p === "Al Soldado") {
+          rolesParaAdicionar.push('1521632259478651020'); 
+        }
+
+       
+        const cargosFiltrados = rolesParaAdicionar.filter(id => id && id.trim() !== "");
+        if (cargosFiltrados.length > 0) {
+          await membro.roles.add(cargosFiltrados);
+        }
+
+      
         const nick = `${dados.patente} PM. ${dados.nome} ${dados.tiposanguineo}`;
         await membro.setNickname(nick);
       } catch (err) {
@@ -283,7 +320,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       return interaction.update({ content: `✅ O registro de <@${userId}> foi **aprovado**!`, components: [] });
     }
 
-    // 8. BOTÃO DE NEGAR
+    
     if (interaction.isButton() && interaction.customId.startsWith('negar_')) {
       if (!interaction.member.roles.cache.has(CARGO_APROVADOR) && !interaction.member.permissions.has('Administrator')) {
         return interaction.reply({ content: '❌ Você não tem autorização para recusar este registro.', flags: [MessageFlags.Ephemeral] });
