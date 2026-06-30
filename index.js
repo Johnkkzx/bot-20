@@ -35,21 +35,21 @@ const COMPANHIAS = {
   "2ª CIA": { cargo: "1510318160010674379" }
 };
 
+// Atualizado com os nomes exatos solicitados e mantendo os IDs originais
 const PATENTES = {
-  "Coronel": { cargo: "1474226455729668156", prefixo: "[✵ ✵ ✵]", emoji: "1518085181221769276" },
-  "Tenente-Coronel": { cargo: "1474226912934232239", prefixo: "[✵ ✵ ✧]", emoji: "1518085261744013342" },
-  "Major": { cargo: "1512085315177807882", prefixo: "[✷✧✧]", emoji: "1518085342522245271" },
-  "Capitão": { cargo: "1474228200694616176", prefixo: "[✧ ✧ ✧]", emoji: "1518090001177645168" },
-  "1º Tenente": { cargo: "1474228316100886702", prefixo: "[✧ ✧]", emoji: "1518086107726876853" },
-  "2º Tenente": { cargo: "1474228418420670596", prefixo: "[✧]", emoji: "1518086151636779008" },
-  "Aspirante": { cargo: "1474228707173601330", prefixo: "[✯]", emoji: "1518086204891992216" },
-  "Subtenente": { cargo: "1474229761550061629", prefixo: "[▵]", emoji: "1518086267198242866" },
-  "1º Sargento": { cargo: "1474230092631642215", prefixo: "[❯❯❯ ❯❯]", emoji: "1518086321883713687" },
-  "2º Sargento": { cargo: "1474230277957222420", prefixo: "[❯❯❯ ❯]", emoji: "1518086366884397268" },
-  "3º Sargento": { cargo: "1474230429350363166", prefixo: "[❯❯❯]", emoji: "1518086419099156591" },
-  "Cabo": { cargo: "1474230554453872680", prefixo: "[❯❯]", emoji: "1518086482148196362" },
-  "Soldado": { cargo: "1474230626231259207", prefixo: "[❯]", emoji: "1518086550251114658" },
-  "Al Soldado": { cargo: "1474230926836895876", prefixo: "[❯]", emoji: "1518086550251114658" },
+  "Coronel": { cargo: "1474226455729668156", emoji: "1518085181221769276" },
+  "T.Coronel": { cargo: "1474226912934232239", emoji: "1518085261744013342" },
+  "Major": { cargo: "1512085315177807882", emoji: "1518085342522245271" },
+  "Capitão": { cargo: "1474228200694616176", emoji: "1518090001177645168" },
+  "1° Tenente": { cargo: "1474228316100886702", emoji: "1518086107726876853" },
+  "2° Tenente": { cargo: "1474228418420670596", emoji: "1518086151636779008" },
+  "Aspirante": { cargo: "1474228707173601330", emoji: "1518086204891992216" },
+  "Subtenente": { cargo: "1474229761550061629", emoji: "1518086267198242866" },
+  "1° Sgt": { cargo: "1474230092631642215", emoji: "1518086321883713687" },
+  "2° Sgt": { cargo: "1474230277957222420", emoji: "1518086366884397268" },
+  "3° Sgt": { cargo: "1474230429350363166", emoji: "1518086419099156591" },
+  "Cabo": { cargo: "1474230554453872680", emoji: "1518086482148196362" },
+  "Soldado": { cargo: "1474230626231259207", emoji: "1518086550251114658" }
 };
 
 let registros = new Map();
@@ -116,15 +116,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
       return interaction.reply({ embeds: [embed], components: [row] });
     }
 
-    // 2. CLICOU EM INICIAR REGISTRO -> ABRE MODAL
+    // 2. CLICOU EM INICIAR REGISTRO -> ABRE MODAL (TIPO SANGUÍNEO NO LUGAR DO RG)
     if (interaction.isButton() && interaction.customId === 'abrir_registro') {
       const modal = new ModalBuilder()
         .setCustomId('modal_registro')
         .setTitle('Ficha de Registro Policial');
 
       modal.addComponents(
-        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('nome').setLabel('Nome de Guerra').setStyle(TextInputStyle.Short).setPlaceholder('Ex: Silva').setRequired(true)),
-        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('rg').setLabel('Número do RG').setStyle(TextInputStyle.Short).setPlaceholder('Ex: 12345').setRequired(true)),
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('nome').setLabel('Nome de Guerra').setStyle(TextInputStyle.Short).setPlaceholder('Ex: A. Santos').setRequired(true)),
+        new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('tiposanguineo').setLabel('Tipo Sanguíneo').setStyle(TextInputStyle.Short).setPlaceholder('Ex: AB-').setRequired(true)),
         new ActionRowBuilder().addComponents(new TextInputBuilder().setCustomId('autorizacao').setLabel('Quem autorizou?').setStyle(TextInputStyle.Short).setPlaceholder('Ex: Cel. Roberto').setRequired(true)),
       );
 
@@ -135,193 +135,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (interaction.isModalSubmit() && interaction.customId === 'modal_registro') {
       registros.set(interaction.user.id, {
         nome: interaction.fields.getTextInputValue('nome'),
-        rg: interaction.fields.getTextInputValue('rg'),
+        tiposanguineo: interaction.fields.getTextInputValue('tiposanguineo').toUpperCase(), // Força maiúsculo pra manter padrão
         autorizacao: interaction.fields.getTextInputValue('autorizacao'),
       });
       salvarRegistros();
 
       const companhiaMenu = new StringSelectMenuBuilder()
-        .setCustomId('selecionar_companhia')
-        .setPlaceholder('Escolha a sua Companhia...')
-        .addOptions(
-          Object.keys(COMPANHIAS).map(cia => ({ label: cia, value: cia }))
-        );
-
-      return interaction.reply({
-        content: '↳ **Etapa 2/4:** Selecione a sua companhia abaixo:',
-        flags: [MessageFlags.Ephemeral],
-        components: [new ActionRowBuilder().addComponents(companhiaMenu)]
-      });
-    }
-
-    // 4. SELECIONOU COMPANHIA -> APRESENTA MENU DE PATENTE
-    if (interaction.isStringSelectMenu() && interaction.customId === 'selecionar_companhia') {
-      const ciaSelecionada = interaction.values[0];
-      const dados = registros.get(interaction.user.id);
-
-      if (!dados) return interaction.reply({ content: '❌ Seus dados de registro não foram encontrados. Tente novamente.', flags: [MessageFlags.Ephemeral] });
-
-      dados.companhia = ciaSelecionada;
-      salvarRegistros();
-
-      const patenteMenu = new StringSelectMenuBuilder()
-        .setCustomId('selecionar_patente')
-        .setPlaceholder('Escolha a sua Patente...');
-
-      // Mapeia as patentes estruturando o ID do Emoji corretamente se for customizado
-      Object.keys(PATENTES).forEach(patente => {
-        const opt = { label: patente, value: patente };
-        if (PATENTES[patente].emoji) opt.emoji = { id: PATENTES[patente].emoji };
-        patenteMenu.addOptions(opt);
-      });
-
-      return interaction.update({
-        content: '↳ **Etapa 3/4:** Selecione a sua Patente abaixo:',
-        components: [new ActionRowBuilder().addComponents(patenteMenu)]
-      });
-    }
-
-    // 5. SELECIONOU PATENTE -> TELA DE REVISÃO E ENVIO
-    if (interaction.isStringSelectMenu() && interaction.customId === 'selecionar_patente') {
-      const patenteSelecionada = interaction.values[0];
-      const dados = registros.get(interaction.user.id);
-
-      if (!dados) return interaction.reply({ content: '❌ Seus dados de registro não foram encontrados. Tente novamente.', flags: [MessageFlags.Ephemeral] });
-
-      dados.patente = patenteSelecionada;
-      salvarRegistros();
-
-      return interaction.update({
-        content: `📋 **Tudo pronto!** Revise as informações principais:\n• Companhia: **${dados.companhia}**\n• Patente: **${patenteSelecionada}**\n\nClique no botão abaixo para despachar sua ficha para a banca avaliadora.`,
-        components: [
-          new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-              .setCustomId('confirmar_registro')
-              .setLabel('Enviar Ficha para Análise')
-              .setStyle(ButtonStyle.Success)
-              .setEmoji('✅')
-          )
-        ]
-      });
-    }
-
-    // 6. CONFIRMAR E ENVIAR PARA CANAL DE APROVAÇÃO
-    if (interaction.isButton() && interaction.customId === 'confirmar_registro') {
-      const dados = registros.get(interaction.user.id);
-
-      if (!dados) return interaction.reply({ content: '❌ Seus dados de registro não foram encontrados.', flags: [MessageFlags.Ephemeral] });
-
-      const canal = interaction.guild.channels.cache.get(CANAL_APROVACAO);
-      if (!canal) return interaction.reply({ content: '❌ Canal administrativo de aprovação não foi encontrado.', flags: [MessageFlags.Ephemeral] });
-
-      const embed = new EmbedBuilder()
-        .setTitle('⏳ AGUARDANDO APROVAÇÃO')
-        .setDescription(`Uma nova ficha de incorporação foi enviada e necessita de validação imediata.`)
-        .setColor('#eab308')
-        .addFields(
-          { name: '👤 Policial:', value: `<@${interaction.user.id}> (\`${interaction.user.id}\`)` },
-          { name: '🪪 Nome de Guerra:', value: dados.nome, inline: true },
-          { name: '📜 RG:', value: dados.rg, inline: true },
-          { name: '🔑 Autorizado por:', value: dados.autorizacao, inline: true },
-          { name: '🛡️ Companhia:', value: dados.companhia, inline: true },
-          { name: '🎖️ Patente Solicitada:', value: dados.patente, inline: true }
-        )
-        .setThumbnail(interaction.user.displayAvatarURL({ dynamic: true }))
-        .setTimestamp();
-
-      const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId(`aprovar_${interaction.user.id}`).setLabel('Aprovar Registro').setStyle(ButtonStyle.Success).setEmoji('✅'),
-        new ButtonBuilder().setCustomId(`negar_${interaction.user.id}`).setLabel('Recusar Registro').setStyle(ButtonStyle.Danger).setEmoji('❌')
-      );
-
-      await canal.send({ embeds: [embed], components: [row] });
-      return interaction.update({ content: '✅ **Sua ficha foi enviada com sucesso!** Aguarde a avaliação dos Oficiais Superiores.', components: [] });
-    }
-
-    // 7. BOTÃO DE APROVAR (AÇÃO DO OFICIAL)
-    if (interaction.isButton() && interaction.customId.startsWith('aprovar_')) {
-      if (!interaction.member.roles.cache.has(CARGO_APROVADOR) && !interaction.member.permissions.has('Administrator')) {
-        return interaction.reply({ content: '❌ Você não tem a atribuição necessária para validar este registro.', flags: [MessageFlags.Ephemeral] });
-      }
-
-      const userId = interaction.customId.split('_')[1];
-      const dados = registros.get(userId);
-
-      if (!dados) return interaction.reply({ content: '❌ Dados cadastrais limpos do cache ou inválidos.', flags: [MessageFlags.Ephemeral] });
-
-      try {
-        const membro = await interaction.guild.members.fetch(userId);
-        
-        // Aplica o cargo da Companhia
-        if (COMPANHIAS[dados.companhia]?.cargo) await membro.roles.add(COMPANHIAS[dados.companhia].cargo);
-        
-        // Aplica o cargo da Patente
-        if (PATENTES[dados.patente]?.cargo) await membro.roles.add(PATENTES[dados.patente].cargo);
-
-        // Define o Nickname Automático: [PREFIXO] Nome | RG
-        const nick = `${PATENTES[dados.patente].prefixo} ${dados.nome} | ${dados.rg}`;
-        await membro.setNickname(nick);
-      } catch (err) {
-        console.error("Erro ao aplicar cargos ou apelido:", err.message);
-      }
-
-      const canalAprovados = interaction.guild.channels.cache.get(CANAL_APROVADOS);
-      if (canalAprovados) {
-        const embedAprovado = new EmbedBuilder()
-          .setTitle('✅ CORPORAÇÃO ATUALIZADA - INCORPORADO')
-          .setColor('#22c55e')
-          .setDescription(`O cidadão faz parte oficialmente do departamento militar.`)
-          .addFields(
-            { name: '👤 Operador:', value: `<@${userId}>` },
-            { name: '🪪 Identidade (RG):', value: `\`${dados.rg}\``, inline: true },
-            { name: '🛡️ Companhia:', value: `**${dados.companhia}**`, inline: true },
-            { name: '🎖️ Patente/Cargo:', value: `\`${dados.patente}\``, inline: true }
-          )
-          .setThumbnail(interaction.guild.iconURL({ dynamic: true }))
-          .setTimestamp();
-
-        await canalAprovados.send({ embeds: [embedAprovado] });
-      }
-
-      return interaction.update({ content: `✅ O registro de <@${userId}> foi **aprovado**!`, components: [] });
-    }
-
-    // 8. BOTÃO DE NEGAR (AÇÃO DO OFICIAL)
-    if (interaction.isButton() && interaction.customId.startsWith('negar_')) {
-      if (!interaction.member.roles.cache.has(CARGO_APROVADOR) && !interaction.member.permissions.has('Administrator')) {
-        return interaction.reply({ content: '❌ Você não tem autorização para recusar este registro.', flags: [MessageFlags.Ephemeral] });
-      }
-
-      const userId = interaction.customId.split('_')[1];
-      const dados = registros.get(userId);
-
-      const canalRecusados = interaction.guild.channels.cache.get(CANAL_RECUSADOS);
-      if (canalRecusados && dados) {
-        const embedRecusado = new EmbedBuilder()
-          .setTitle('❌ SOLICITAÇÃO RECUSADA')
-          .setColor('#ef4444')
-          .setDescription(`A ficha de incorporação enviada não atende aos parâmetros exigidos.`)
-          .addFields(
-            { name: '👤 Candidato reprovado:', value: `<@${userId}>` },
-            { name: '🪪 Nome enviado:', value: dados.nome, inline: true },
-            { name: '📜 RG informado:', value: `\`${dados.rg}\``, inline: true }
-          )
-          .setTimestamp();
-
-        await canalRecusados.send({ embeds: [embedRecusado] });
-      }
-
-      registros.delete(userId);
-      salvarRegistros();
-      return interaction.update({ content: `❌ O registro de <@${userId}> foi **recusado**.`, components: [] });
-    }
-
-  } catch (error) {
-    console.error("Erro na execução da interação:", error);
-  }
-});
-
-process.on('unhandledRejection', console.error);
-process.on('uncaughtException', console.error);
-
-client.login(process.env.TOKEN);
+        .
